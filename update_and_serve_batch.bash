@@ -5,8 +5,8 @@ set -e
 set -o errexit
 shopt -s -o errexit
 
-st=staging
-BA=cbzbatch
+st=~/staging
+BA=~/cbzbatch
 
 # Create staging dir
 mkdir -p $st
@@ -29,7 +29,7 @@ x
 # Extract last three elements in path, (series/chapter #/page #.jpg)
 # then add staging directory prefix
 # and leftpad chapter and page with zeros
-s/^.*\/([^\/]+)\/[^\/[:digit:]]*([[:digit:]]+)[^\/]*\/([^\/]+$)/$st\/\1\n0000\2\/0000\3/
+s/^.*\/([^\/]+)\/[^\/[:digit:]]*([[:digit:]]+)[^\/]*\/([^\/]+$)/${st//\//\\/}\/\1\n0000\2\/0000\3/
 
 # Remove extraneous zeros and remove slash
 s_(.*)\n0*([[:digit:]]{4,})/0*([[:digit:]]{4,}.+$)_\1\n\2\3_
@@ -53,7 +53,8 @@ link() {
 	echo -e "\t $1"
 
 	# Pipe all the jpegs, filtering some junk files with grep,
-	# Run generated commands with sed
+	# Code generation with sed, filter unique lines,
+	# Launch nested parallel execution
 	find "$1" -type f -name *.jpg | grep -v \.trashed | sed -n -Ee "$2"
 }
 
