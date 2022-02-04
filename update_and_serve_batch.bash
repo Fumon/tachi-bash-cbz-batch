@@ -17,33 +17,35 @@ mkdir -p $BA
 rm -fr $BA/*
 
 sedscript=$(sed -n -Ee "/^EOF$/{x;s/\n/;/g;p;d};/^[^#]/{H;d}" <<__here
-# Copy to hold
+# Copy full path to hold
 h
 
-# Set up ln command with original path as first argument
+# Set up ln command with the file's original path delimited by a newline in the buffer
 s/^(.*)$/ln -sT\n\1/
 
-# Swap to hold
+# Swap to the stored full path
 x
 
-# Extract last three elements in path, (series/chapter #/page #.jpg)
+# Extract last three elements in path, series/chapter #(.version)/page #.jpg
 # then add staging directory prefix
-# and leftpad chapter and page with zeros
+# then insert zeros in front of chapter, version (whether it was there or not) and page #
 s/^.*\/([^\/]+)\/[^\/[:digit:]]*([[:digit:]]+)[\.]?([[:digit:]]*)[^\/]*\/([^\/]+$)/${st//\//\\/}\/\1\n0000\2.00\3\/0000\4/
 
-# Remove extraneous zeros and remove slash
+# Remove extraneous zeros to cause leftpadding,
+# remove path slash,
+# and insert a newline delimiter between the series name and the filename
 s_(.*)\n0*([[:digit:]]{4,})\.0*([[:digit:]]{2,})/0*([[:digit:]]{4,}.+$)_\1\n\2\3\4_
 
-# Append to ln command in hold
+# Append the series name and file name to the ln command in the buffer with a newline in front
 H
 
-# Extract series name into mkdir command
+# Extract only the series name (part before the newline) into a mkdir command and execute it
 s_(.*)\n.*_mkdir -p \"\1\"_e
 
-# Swap
+# Swap to the ln command in the buffer
 x
 
-# Final cleanup and insert staging path
+# Remove all the newline delimiters, surround paths with quotes and execute the ln command
 s/^(.*)\n(.*)\n(.*)\n(.*)$/\1 \"\2\" \"\3\/\4\"/e
 EOF
 __here
