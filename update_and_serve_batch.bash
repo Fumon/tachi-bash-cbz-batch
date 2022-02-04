@@ -29,10 +29,10 @@ x
 # Extract last three elements in path, (series/chapter #/page #.jpg)
 # then add staging directory prefix
 # and leftpad chapter and page with zeros
-s/^.*\/([^\/]+)\/[^\/[:digit:]]*([[:digit:]]+)[^\/]*\/([^\/]+$)/${st//\//\\/}\/\1\n0000\2\/0000\3/
+s/^.*\/([^\/]+)\/[^\/[:digit:]]*([[:digit:]]+)[\.]?([[:digit:]]*)[^\/]*\/([^\/]+$)/${st//\//\\/}\/\1\n0000\2.00\3\/0000\4/
 
 # Remove extraneous zeros and remove slash
-s_(.*)\n0*([[:digit:]]{4,})/0*([[:digit:]]{4,}.+$)_\1\n\2\3_
+s_(.*)\n0*([[:digit:]]{4,})\.0*([[:digit:]]{2,})/0*([[:digit:]]{4,}.+$)_\1\n\2\3\4_
 
 # Append to ln command in hold
 H
@@ -86,7 +86,7 @@ echo "--- DONE ---"
 
 
 # Remove Staging
-rm -r $st
+#rm -r $st
 
 cd $BA
 python -m 'http.server'
