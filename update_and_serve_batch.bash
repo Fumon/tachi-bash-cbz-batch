@@ -57,7 +57,7 @@ link() {
 	# Pipe all the jpegs, filtering some junk files with grep,
 	# Code generation with sed, filter unique lines,
 	# Launch nested parallel execution
-	find "$1" -type f -name *.jpg | grep -v \.trashed | sed -n -Ee "$2"
+	find "$1" -type f \( -iname *.jpg -o -iname *.png -o -iname *.jpeg \) | grep -v \.trashed | sed -n -Ee "$2"
 }
 
 
@@ -88,7 +88,7 @@ echo "--- DONE ---"
 
 
 # Remove Staging
-#rm -r $st
+rm -r $st
 
 cd $BA
 python -m 'http.server'
